@@ -1,0 +1,26 @@
+name: Deploy static dist/ to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Trigger only on pushes to the main branch
+
+permissions:
+  contents: write  # Required to push to gh-pages
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1  # shallow clone for speed
+
+      - name: Deploy dist/ to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./release/dist
+          publish_branch: gh-pages
