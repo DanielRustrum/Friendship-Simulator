@@ -5,6 +5,7 @@ import { GameController } from './engine/game'
 import { Component } from './engine/types/component'
 import { setupDataController } from './components/Game/Data'
 import { TimeData } from './mechanics/time'
+import { ConversationData } from './components/Game/Conversation'
 
 const panels = Object.fromEntries(
     Object.values(
@@ -21,7 +22,7 @@ const panels = Object.fromEntries(
 const Error = ({ }) => <>Help! Navigation Error!</>
 
 
-type GlobalDataStore  = TimeData
+type GlobalDataStore  = TimeData | ConversationData
 
 const Global = () => {
     const DataProvider = setupDataController<GlobalDataStore>()
