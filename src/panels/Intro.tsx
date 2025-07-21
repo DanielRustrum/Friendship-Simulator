@@ -19,8 +19,8 @@ export const Panel = () => {
     return <MenuBackground>
         <p>Logo Goes Here</p>
         {isFirefox ?
-                <p>{ GeneralText.error_messages.using_firefox }</p> :
-                <></>
+            <p>{ GeneralText.error_messages.using_firefox }</p> :
+            <></>
         }
     </MenuBackground>
 }

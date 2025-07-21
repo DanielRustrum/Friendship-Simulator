@@ -23,6 +23,9 @@ export default tseslint.config(
         'warn',
         { allowConstantExport: true },
       ],
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-empty-pattern": "off",
+      "react-hooks/exhaustive-deps": "off",
     },
   },
 )

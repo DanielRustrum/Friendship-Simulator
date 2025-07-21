@@ -29,6 +29,7 @@ type GlobalPanelMethods = {
     changePanel: (name: string) => void
 }
 
+
 const GlobalPanelContext = createContext<GlobalPanelMethods | null>(null)
 
 export const PanelController: PanelControllerComponent = ({

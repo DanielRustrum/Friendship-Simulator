@@ -1,4 +1,5 @@
 {
     "intro_timeout_length": 3000,
-    "start_scene": "demo"
+    "start_scene": "tc-fountain",
+    "total_actions": 10
 }
