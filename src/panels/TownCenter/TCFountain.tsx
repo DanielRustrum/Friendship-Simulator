@@ -17,6 +17,13 @@ const Scene = () => {
         >
             Clicked: {getTime()}
         </Button>
+        <Button
+            onClick={() => {
+                progressTime(3)
+            }}
+        >
+            Clicked: {getTime()}
+        </Button>
         <p>Player Name: {getData("player_name", "Player")}</p>
         <input
             className="border border-gray-300 p-2 rounded"

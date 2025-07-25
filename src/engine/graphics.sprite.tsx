@@ -276,12 +276,8 @@ export const spritesheet: SpritesheetFunction = (src, options = {}) => {
             Object.assign(
                 sprite_style,
                 children ?
-                    {
-                        backgroundPosition: offset
-                    } :
-                    {
-                        objectPosition: offset
-                    }
+                    { backgroundPosition: offset } :
+                    { objectPosition: offset }
             );
 
 
@@ -330,7 +326,6 @@ export namespace Stack {
     const StackContext = createContext<{
         baseRef: RefObject<HTMLElement>
         container_scale: number
-        base_tile_size: { x: number, y: number }
     } | null>(null)
 
     const scaleChildren = (children: Sprite, containerScale: number, resizing: boolean) => {
@@ -357,7 +352,7 @@ export namespace Stack {
                 (child.type as any).isSpriteComponent
             ) {
                 const childScale = (child.props as any)?.scale ?? 1
-                const effectiveScale = childScale * containerScale 
+                const effectiveScale = childScale * containerScale
 
                 console.log("Scaling child", containerScale, effectiveScale)
 
@@ -409,11 +404,7 @@ export namespace Stack {
         return (
             <StackContext.Provider value={{
                 baseRef,
-                container_scale: dynamicScale,
-                base_tile_size: {
-                    x: tile_size[1] * baseScale,
-                    y: tile_size[0] * baseScale
-                }
+                container_scale: dynamicScale
             }}>
                 <div
                     {...props}
@@ -442,7 +433,7 @@ export namespace Stack {
         x: number
         y: number
     }> = ({ x, y, style, children, ...props }) => {
-        const { container_scale, base_tile_size } = useContext(StackContext)!
+        const { container_scale } = useContext(StackContext)!
         const isResizing = resizeTo !== null
         const scaledBase = scaleChildren(children, container_scale, isResizing) as ReactNode
 
@@ -451,7 +442,7 @@ export namespace Stack {
                 {...props}
                 style={{
                     position: "absolute",
-                    left: `${(base_tile_size.x * container_scale) * x / base_tile_size.x}px`,
+                    left: `${x * container_scale}px`,
                     top: `${y * container_scale}px`,
                     pointerEvents: "none",
                     ...style,
