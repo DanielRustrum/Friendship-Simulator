@@ -1,5 +1,5 @@
 import { Component } from "@/engine/types/component"
-import { createContext, useContext, useRef, useState } from "react"
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState } from "react"
 import { Button } from "@ui/Button"
 import { useData } from "./Data"
 
@@ -53,15 +53,18 @@ const CharacterSlot: Component<{
     current_conversation: Array<DialogueEntry>,
     conversation_index: number
     position: "left" | "right"
+    closing: boolean
 }> = ({
     current_conversation,
     conversation_index,
-    position
+    position,
+    closing = false
 }) => {
         const ExpressionRef = useRef<string | undefined>(undefined)
         const NameRef = useRef<string | undefined>(undefined)
         const dialogue = current_conversation[conversation_index]
         const [getData] = useData()
+        const [animateIn, setAnimateIn] = useState(false)
 
 
         if (conversation_index === 0) {
@@ -84,14 +87,33 @@ const CharacterSlot: Component<{
 
         const name = NameRef.current ?? "???"
         const expression = ExpressionRef.current ?? "blank"
+        const isHidden = dialogue.hide?.includes(position)
+
+        useEffect(() => {
+            if (conversation_index === 0 && !isHidden) {
+                requestAnimationFrame(() => setAnimateIn(true))
+            }
+        }, [conversation_index, isHidden])
+
+        const slideClass = position === 'left'
+            ? '-translate-x-[50vw]'
+            : 'translate-x-[50vw]'
+
+
+        const transitionClass = isHidden || closing
+            ? `opacity-0 ${slideClass} pointer-events-none`
+            : animateIn
+                ? `opacity-100 translate-x-0`
+                : `opacity-0 ${slideClass}`
 
         return (
-            <div className="w-[30vw] h-[60vh]">
+            <div className="w-[40vw] h-[60vh] overflow-hidden">
                 <div
-                    style={{
-                        display: dialogue.hide?.includes(position) ? 'none' : 'block'
-                    }}
-                    className=" bg-orange-300 h-full w-full"
+                    className={`
+                        bg-orange-300 h-full w-full
+                        transition-all duration-1000 ease-out transform
+                        ${transitionClass}
+                    `}
                 >
                     <p>{name}</p>
                     <p>{expression}</p>
@@ -100,14 +122,91 @@ const CharacterSlot: Component<{
         )
     }
 
+const DialogueBox: Component<{
+    text: string
+    speaker: string
+    closing: boolean
+    index: number
+    length: number
+    onClick: () => void
+}> = ({ text, speaker, closing, length, onClick, index }) => {
+    const [animateIn, setAnimateIn] = useState(false)
+    const boxRef = useRef<HTMLDivElement>(null)
+
+    // Force DOM to render initial hidden state, then trigger animation
+    useLayoutEffect(() => {
+        if (index === 0) {
+            setAnimateIn(false)
+            // Force reflow to lock in starting state
+            const box = boxRef.current
+            if (box) {
+                box.getBoundingClientRect() // force DOM reflow
+            }
+            setAnimateIn(true)
+        }
+    }, [index])
+
+    const transitionClass = closing
+        ? "opacity-0 translate-y-[20vh] pointer-events-none"
+        : animateIn
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 translate-y-[20vh]"
+
+    return (
+        <div
+            ref={boxRef}
+            className={`
+        flex p-5 gap-10 bg-white justify-between h-[20vh]
+        transition-all duration-1000 ease-out transform
+        ${transitionClass}
+      `}
+        >
+            {length === 0 ? (
+                <p>No conversation selected</p>
+            ) : (
+                <div className="flex flex-col items-start gap-5">
+                    <p className="font-bold">{speaker}</p>
+                    <p>{text}</p>
+                </div>
+            )}
+            <Button
+                className="self-end"
+                onClick={onClick}
+                disabled={closing}
+            >
+                Next
+            </Button>
+        </div>
+    )
+}
+
+
+
 export const ConversationManager: Component = ({ children }) => {
     const [current_conversation, setCurrentConversation] = useState<Array<DialogueEntry>>([])
     const [conversation_index, setConversationIndex] = useState(0)
     const DialogRef = useRef<HTMLDialogElement>(null)
     const [getData] = useData()
+    const [closing, setClosing] = useState(false)
+    const [animateIn, setAnimateIn] = useState(false)
 
     const openDialog = () => {
         DialogRef.current?.showModal()
+        setAnimateIn(false)
+        requestAnimationFrame(() => setAnimateIn(true)) // allow 1 frame delay
+    }
+
+    const closeDialog = () => {
+        if (conversation_index < current_conversation.length - 1) {
+            setConversationIndex(conversation_index + 1)
+        } else {
+            setClosing(true)
+
+            setTimeout(() => {
+                DialogRef.current?.close()
+                setClosing(false)
+            }, 1000)
+        }
     }
 
     const triggerConversation = (dialogue: string) => {
@@ -115,8 +214,8 @@ export const ConversationManager: Component = ({ children }) => {
         setCurrentConversation(conversation || [])
     }
 
-    const speaker = current_conversation[conversation_index]?.speaker === "player"? 
-        getData("player_name", "You"): 
+    const speaker = current_conversation[conversation_index]?.speaker === "player" ?
+        getData("player_name", "You") :
         current_conversation[conversation_index]?.speaker || "???"
     const capitalizedSpeaker = speaker.charAt(0).toUpperCase() + speaker.slice(1)
 
@@ -125,12 +224,19 @@ export const ConversationManager: Component = ({ children }) => {
         <dialog
             id="conversation-dialog"
             ref={DialogRef}
-            className="
-                w-dvw h-dvh fixed top-0 left-0 max-w-none max-h-none m-0 p-0 
-                bg-black/30 border-none
-            "
+            className={`
+                w-dvw h-dvh fixed top-0 left-0 max-w-none max-h-none m-0 p-0 border-none
+                transition-all duration-500 ease-out
+                backdrop:bg-transparent
+                ${animateIn && !closing ? "bg-black/30 opacity-100" : "bg-transparent opacity-0"}
+            `}
+            onClose={() => {
+                setCurrentConversation([])
+                setConversationIndex(0)
+                setAnimateIn(false)
+            }}
         >
-            <div className="flex flex-col justify-end h-full w-full">
+            <div className="flex flex-col justify-end h-full w-full overflow-hidden">
                 <div className="flex justify-between">
                     {current_conversation.length !== 0 &&
                         <>
@@ -138,39 +244,26 @@ export const ConversationManager: Component = ({ children }) => {
                                 position="left"
                                 conversation_index={conversation_index}
                                 current_conversation={current_conversation}
+                                closing={closing}
                             />
                             <CharacterSlot
                                 position="right"
                                 conversation_index={conversation_index}
                                 current_conversation={current_conversation}
+                                closing={closing}
                             />
                         </>
                     }
                 </div>
-                <div className="flex p-5 gap-10 bg-white justify-between h-[20vh]">
-                    {current_conversation.length === 0 ?
-                        <p>No conversation selected</p> :
-                        <div className="flex flex-col items-start gap-5">
-                            <p className="font-bold">{capitalizedSpeaker}</p>
-                            <p>{current_conversation[conversation_index].text}</p>
-                        </div>
-                    }
-
-
-                    <Button
-                        onClick={() => {
-                            if (conversation_index < current_conversation.length - 1) {
-                                setConversationIndex(conversation_index + 1)
-                            } else {
-                                DialogRef.current?.close()
-                                setConversationIndex(0)
-                            }
-                        }}
-                    >
-                        Next
-                    </Button>
-                </div>
+                <DialogueBox
+                    text={current_conversation[conversation_index]?.text}
+                    speaker={capitalizedSpeaker}
+                    closing={closing}
+                    length={current_conversation.length}
+                    index={conversation_index}
+                    onClick={closeDialog}
+                />
             </div>
         </dialog>
-    </ConversationContext.Provider>
+    </ConversationContext.Provider >
 }

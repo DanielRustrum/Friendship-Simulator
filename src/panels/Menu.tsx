@@ -1,5 +1,5 @@
 import { MenuBackground } from "@/components/Game/Background"
-import { Button } from "@/components/UI/button"
+import { Button } from "@/components/UI/Button"
 import { usePanelNavigation } from "@/engine/panel"
 import GeneralText from "@assets/text/general.json"
 import GeneralData from "@data/general.json"
@@ -13,6 +13,7 @@ export const Panel = () => {
             <Button onClick={() => navigate(GeneralData.start_scene)}>Start</Button>
             <Button onClick={() => navigate("credits")}>About</Button>
             <Button onClick={() => navigate("settings")}>Settings</Button>
+            <Button onClick={() => navigate("demo")}>Demo</Button>
         </div>
     </MenuBackground>
 }
