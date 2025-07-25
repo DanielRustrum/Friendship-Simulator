@@ -13,7 +13,6 @@ export const Panel = () => {
             <Button onClick={() => navigate(GeneralData.start_scene)}>Start</Button>
             <Button onClick={() => navigate("credits")}>About</Button>
             <Button onClick={() => navigate("settings")}>Settings</Button>
-            <Button onClick={() => navigate("demo")}>Demo</Button>
         </div>
     </MenuBackground>
 }

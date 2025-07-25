@@ -1,0 +1,57 @@
+{
+    "name": "Test Dialogue",
+    "description": "A test dialogue file for the game.",
+    "requires": {
+        "items": ["test-item"],
+        "puzzle": ["test-puzzle"],
+        "quest": ["test"]
+    },
+    "dialogue": [
+        {
+            "speaker": "player1",
+            "expression": "neutral",
+            "position": "left",
+            "to": {
+                "speaker": "npc1",
+                "expression": "happy"
+            },
+            "text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+        },
+        {
+            "speaker": "npc2",
+            "expression": "happy",
+            "position": "right",
+            "text": "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+        },
+        {
+            "speaker": "player3",
+            "position": "left",
+            "expression": "thinking",
+            "text": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo."
+        },
+        {
+            "speaker": "player3",
+            "position": "left",
+            "expression": "thinking",
+            "text": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.",
+            "reward": {
+                "friend": "dog",
+                "complete": "true-friendship",
+                "complete_puzzle": "true-friendship-puzzle"
+            },
+            "desicion": [
+                {
+                    "text": "Accept the quest",
+                    "next": "dialog_accepted"
+                },
+                {
+                    "text": "Decline the quest",
+                    "next": "dialog_declined"
+                }
+            ],
+            "hide": [
+                "right"
+            ]
+        }
+    ]
+}
